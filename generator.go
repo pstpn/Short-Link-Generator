@@ -19,31 +19,26 @@ func GenerateShortUrl(url string) string {
 		}
 	}
 
-	var ans [10]byte
-
-	for i := 0; i < 10; i++ {
-		ans[i] = tmp[((int(tmp[i]))%len(url))%32]
-	}
-
-	return "http://exmpl.lnk/" + string(ans[:])
+	return "http://exmpl.lnk/" + string(tmp[:10])
 }
 
 //
 // Testing Hash function
 //
-
 //hashMap := make(map[string]string, 100000000)
+//inHashMap := make(map[string]int, 100000000)
 //errCount := 0
 //
 //var i uint64
+//
 //randSource := rand.NewSource(time.Now().UnixNano())
 //randGen := rand.New(randSource)
 //
-//for k := 0; k < 1000; k++ {
-//	for i = 0; i < 1000; i++ {
-//		curNum := int(uint8(randGen.Int())) + 3
-//		//fmt.Println(curNum)
-//		newUrl := ""
+//for k := 0; k < 10; k++ {
+//	for i = 0; i < 10000; i++ {
+//		curNum := int(uint8(randGen.Int()))
+//
+//		newUrl := "https://vk.com/"
 //		for j := 0; j < curNum; j++ {
 //			tmp := uint8(randGen.Int())
 //			if tmp < 26 || tmp == 96 ||
@@ -57,18 +52,18 @@ func GenerateShortUrl(url string) string {
 //			}
 //			newUrl += string(tmp)
 //		}
-//		//fmt.Println(newUrl)
 //
 //		curHash := GenerateShortUrl(newUrl)
-//		if hashMap[curHash] != "" {
+//		if hashMap[curHash] != "" && inHashMap[newUrl] == 0 {
 //			fmt.Println("DUBLICATE: ", hashMap[curHash]+"   |   "+newUrl)
 //			errCount++
+//			fmt.Println("ERROR_COUNT: ", errCount)
 //		} else {
 //			hashMap[curHash] = newUrl
 //		}
-//	}
 //
-//	fmt.Println("ERROR_COUNT: ", errCount)
+//		inHashMap[newUrl] = 1
+//	}
 //}
 //
 //logFile, _ := os.Create("log.txt")
@@ -81,19 +76,14 @@ func GenerateShortUrl(url string) string {
 
 // Examples:
 
-//New_url: http://exmpl.lnk/mq91urRtqk   |   In_url: xxm2tvkaYbo13MvwyindmVQ2VSY2GnHaxzm5bAX{njq0|U=gFLqboy:3DchDuggIzm
-//New_url: http://exmpl.lnk/gckgccmDgn   |   In_url: uirri0Lt{vhkmWDB1wpvup9J{mcoqdfzmhQRdjqd;quhs1En{7ZftuDKAll<xw|05y
-//New_url: http://exmpl.lnk/5jirwbKaiP   |   In_url: GcpuNcEiapoeW0tDWPnnvZ[Xy|2kdncmaoYgc6h2BSvlkeMq{vSACwZysMjNhtf0jtWdSqqVY=FlQQm2Z>{4m|vayXUkfpnyxcuflXuxCq=o{nTq0Wsi05oCli{3fdbynbe1kWssBy
-//New_url: http://exmpl.lnk/ATY9wY4c5Y   |   In_url: xe9e5zIocPWalfxkYBp4ddhw56CpQ04foqr=es_M>R2jrzlgq00sEjMfog|cnpKktf<uxseLQjkrKD3{NK2qejqxeMr=TG{4oVpv0RLys{T{xa|hIwWaXipfisGhrrlxxMYYmdwlFghsv{{PVe|jhl|ndLrhFyiv|Kwxal|L{cK|qZ0eJbz|xm=pYdlb3zmQ7MPo5qrx<uFvRsEr>j13|im5qfgMqvqj=VeYPhO;bpbzZ
-//New_url: http://exmpl.lnk/ltgCCvv8wi   |   In_url: qtKkpMNchYyVx2ye4ob=ptZXcUk4f=QjoHBb5q=|4ltaSbexu0wqQ2LHnc4owhmzalUXexcRhtulcdi>N|gneifanQqTn4nvn
-//New_url: http://exmpl.lnk/huqRuRp22f   |   In_url: 9pdtwamgyydHs8YjuWuqY|diukx=Per
-//New_url: http://exmpl.lnk/E4x4U3JdUr   |   In_url: XbMgqj{BNlCn{PWU6v3xyboeQlkt0w9luoLrz|orDYqOpVSaOY7jRF0uW=akY1x|vow4oJCvpXjzocsK
-//New_url: http://exmpl.lnk/t2OBoEdEoE   |   In_url: ebigjX{hdsj6F
-//New_url: http://exmpl.lnk/0rbuJz_uJb   |   In_url: 7odZ_IXo{Guxr{>lHzru8kavtlFt7uUtuMXNlmbb>uyctsui>l|u
-//New_url: http://exmpl.lnk/weQ2iimViV   |   In_url: stlUWc0E54a0P3xeJbtS9He2pVd0ed=4>l98KbNKct2>xCroHrtoJ>tnbP1ibW2lD:iobvHtsOya1BW{zku>yjolhOE3iB8g|9FLzbeHiXAB_QZPW5hnoV3X9XyYsy|dA=L:erb2:adyeecSasCosuDLg9ydz80Nzco9zIw0mlithQ6rqHHojisepvjp|4bfqlXYnysz0MnvuOclb<gigtEQr5p{0|
-//New_url: http://exmpl.lnk/8wbbK8vvv0   |   In_url: u|0Kdn[mgkld_9yhalQnomk3qnpiyblnokqcGKkDX=EcLJu0c9u7YcQniMMe[XXkvXxnydt1Ou1DFd{b63mZ<pv:<{fsrbZVBraSd3G>k4utYHaVvdtWUbbX6xqjkAXyq43Gmaiq4sts
-//New_url: http://exmpl.lnk/HNompnovup   |   In_url: LuvgG|tpOPuXuJWbMvfzbesxpod4rrxEVrRmsh|Hn3D>mR|lucx2YCfmxcvkzwq|01xDeufedwec=g;bauwDtj8wd0LFwlMuviZ{QtEcjmb
-//New_url: http://exmpl.lnk/wzbbyzbwQw   |   In_url: fqybds5ns
-//New_url: http://exmpl.lnk/6flYicsaca   |   In_url: bx9xz2ir:ccS2nUIbKf1r>d{sNqs|dMfnaksuaQeznj1nOt84esbvrap
-//New_url: http://exmpl.lnk/aaa0aaIsDh   |   In_url: 5iVcswYbaqepyVnpw9k{ij;Yznm7zzTVxumhexbYug{mRnf>m<0va4edbhbylppfGgprQ4pmrkqyst0AEPM>nYfh1v0Azn{|dDOoyj6HmtXmVPOXs
-//New_url: http://exmpl.lnk/caaccccAAc   |   In_url: |vwR
+//New_url: http://exmpl.lnk/B5ewlrwvyM   |   In_url: https://vk.com/UU20H51XnnqlYAcmuiNWQunyV2vjswtim=LBMzEgcHN0Ybs{OX{00;2upd;r2Dbx7m0bsqhnFaeeghYvk|Hzw78qrEuJ3|[4wpWe>41v3rzQQ4bs3leGr7J9sBpso=xMd<tlvs=molyhuzwapRhYgnasp0Jxzsl
+//New_url: http://exmpl.lnk/eE851lbxMg   |   In_url: https://vk.com/fmsbCloegFF2CNxaqd:SicjInYlWPI2cy_Fy6WfXOVWlCkGsw|qqTGw1o>swpnMl2EX1RcvQ3I_vKptmmta1i1gkxbo{X|ure
+//New_url: http://exmpl.lnk/TeZdsYyxv3   |   In_url: https://vk.com/gPlXqqVb2|d
+//New_url: http://exmpl.lnk/KqjuEzvTun   |   In_url: https://vk.com/uLlk
+//New_url: http://exmpl.lnk/zf1Ul9wjQ9   |   In_url: https://vk.com/sg5LtnClw|34oj3TaZk=tn2azxpUoxrayndg3nv7NkTi1qpwyo0CTlgj3rapW2;eiMpljbqRWkaGyZfPjSvcsi={nLmvbpDRPdruln|diQWRryySaj<xhdORnrwra=aceYq1jAN|A0qSafg=juQsEs3jUhChwmvUSitO
+//New_url: http://exmpl.lnk/6x4k3uuSba   |   In_url: https://vk.com/ipIZ:jzqw0Y8E<b0whguVw<9newS3t|r1mrcspamC8=2fFkDsnnre[nwsnd[yR1kItnOeh{Cy[LbZs3ppxqnc<oxtenm{nljzC|wmq4PpNmPw2u=AaXddqdiUSwbsl|mNkto0b78bcfhnh559orpy
+//New_url: http://exmpl.lnk/U7zceWfQka   |   In_url: https://vk.com/aLds
+//New_url: http://exmpl.lnk/lrulumnnkc   |   In_url: https://vk.com/TauhDgcuxavjzpuo3aVdJo>;qonQ<jy|mQf08lnn|b81QG9sevjeptYWckdxa|
+//New_url: http://exmpl.lnk/u6utH2wloY   |   In_url: https://vk.com/2KI<i0{jV3{<TWXleySfs5KPB2{4gIVsQz{am>YdwkBjjsiOhb0im:CFvcIn311JWgsAx>i2c[xt>oc>hdugn3mtwoe|qpx7klyHo6yvLHbNw65cnbcS5J10Tmt[Shhou3QUmoH63tBh5mwbfpvugz2ia3o<|bwil4e|MonyPlD8_1nKhodt;ytlfGPcT8eip1KderAogKTn9dcOtg0zkWmeMas0aRrrs8g{qKdv:I
+//New_url: http://exmpl.lnk/1NvfLmMs1h   |   In_url: https://vk.com/xp>iHCzL9aZ{vrzMkXdEv<D8mqmZua
+//New_url: http://exmpl.lnk/aVeaykwqfi   |   In_url: https://vk.com/vgjzeWoamdOx{u{yXV2XrTNRk|LXVd6o
