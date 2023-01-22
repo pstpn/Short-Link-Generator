@@ -1,7 +1,8 @@
-package Short_Link_Generator
+package generator
 
 import (
 	"crypto/sha256"
+	"my_project/urlgen/config"
 )
 
 func GenerateShortUrl(url string) string {
@@ -19,7 +20,7 @@ func GenerateShortUrl(url string) string {
 		}
 	}
 
-	return "http://exmpl.lnk/" + string(tmp[:10])
+	return config.GenUrl + string(tmp[:10])
 }
 
 //
