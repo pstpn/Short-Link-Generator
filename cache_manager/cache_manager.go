@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Cache - Тип данных, реализующий менеджер кеша для работы с кешируемыми данными
 type Cache struct {
 	sync.RWMutex                       // Асинхронность для корректного доступа для чтения и записи
 	defaultExpiration time.Duration    // Продолжительность жизни кеша по умолчанию
@@ -13,12 +14,14 @@ type Cache struct {
 	data              map[string]Value // Непосредственно кешируемые данные
 }
 
+// Value - Тип данных, реализующий структуру конкретного элемента кеша
 type Value struct {
 	CreateTime time.Time // Время создания
 	Expiration int64     // Время истечения актуальности
 	Value      string    // Непосредственно значение
 }
 
+// CacheCreate - Функция, реализующая создание кеша
 func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {
 
 	data := make(map[string]Value)
@@ -36,6 +39,7 @@ func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {
 	return &cache
 }
 
+// Set - Метод, реализующий добавление заданных значений в кеш
 func (c *Cache) Set(key string, value string, duration time.Duration) {
 
 	var expiration int64
@@ -59,6 +63,7 @@ func (c *Cache) Set(key string, value string, duration time.Duration) {
 
 }
 
+// Get - Метод, реализующий получение кеша по заданному ключу
 func (c *Cache) Get(key string) (string, bool) {
 
 	c.RLock()
@@ -78,6 +83,7 @@ func (c *Cache) Get(key string) (string, bool) {
 	return item.Value, true
 }
 
+// Delete - Метод, реализующий удаление элемента кеша
 func (c *Cache) Delete(key string) error {
 
 	c.Lock()
@@ -92,10 +98,12 @@ func (c *Cache) Delete(key string) error {
 	return nil
 }
 
+// startGC - Метод, реализующий запуск очистки кеша
 func (c *Cache) startGC() {
 	go c.gC()
 }
 
+// gC - Метод, реализующий очистку кеша
 func (c *Cache) gC() {
 
 	for {
@@ -111,6 +119,7 @@ func (c *Cache) gC() {
 	}
 }
 
+// expiredKeys - Метод, реализующий поиск неактуального кеша
 func (c *Cache) expiredKeys() (keys []string) {
 
 	c.RLock()
@@ -126,6 +135,7 @@ func (c *Cache) expiredKeys() (keys []string) {
 	return
 }
 
+// clearValues - Метод, реализующий очистку кеша по значению ключей
 func (c *Cache) clearValues(keys []string) {
 
 	c.Lock()

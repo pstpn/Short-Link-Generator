@@ -5,6 +5,7 @@ import (
 	"my_project/urlgen/config"
 )
 
+// GenerateShortUrl - Функция, реализующая создание уникальной короткой ссылки с помощью алгоритма шифрования SHA256
 func GenerateShortUrl(url string) string {
 
 	tmp := sha256.Sum256([]byte(url))
@@ -25,7 +26,7 @@ func GenerateShortUrl(url string) string {
 }
 
 //
-// Examples:
+// Примеры работы функции GenerateShortUrl:
 //
 //New_url: http://exmpl.lnk/B5ewlrwvyM   |   In_url: https://vk.com/UU20H51XnnqlYAcmuiNWQunyV2vjswtim=LBMzEgcHN0Ybs{OX{00;2upd;r2Dbx7m0bsqhnFaeeghYvk|Hzw78qrEuJ3|[4wpWe>41v3rzQQ4bs3leGr7J9sBpso=xMd<tlvs=molyhuzwapRhYgnasp0Jxzsl
 //New_url: http://exmpl.lnk/eE851lbxMg   |   In_url: https://vk.com/fmsbCloegFF2CNxaqd:SicjInYlWPI2cy_Fy6WfXOVWlCkGsw|qqTGw1o>swpnMl2EX1RcvQ3I_vKptmmta1i1gkxbo{X|ure

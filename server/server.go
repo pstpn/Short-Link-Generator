@@ -12,26 +12,33 @@ import (
 	"time"
 )
 
-// Создание кеша (в котором в роли ключа выступает короткая ссылка)
-// с очисткой устаревших ссылок через 20 секунд
-// (предположим, что ссылка действует столько времени)
+/*
+Создание кеша (в котором в роли ключа выступает короткая ссылка)
+с очисткой устаревших ссылок через 20 секунд
+(предположим, что ссылка действует столько времени)
+*/
 var firstCache = cache_manager.CacheCreate(20*time.Second, 20*time.Second)
 
-// Создание кеша (в котором в роли ключа выступает оригинальная ссылка)
-// с очисткой устаревших ссылок через 20 секунд
-// (предположим, что ссылка действует столько времени)
+/*
+Создание кеша (в котором в роли ключа выступает оригинальная ссылка)
+с очисткой устаревших ссылок через 20 секунд
+(предположим, что ссылка действует столько времени)
+*/
 var secondCache = cache_manager.CacheCreate(20*time.Second, 20*time.Second)
 
+// Url - Тип данных, описывающий структуру для представления ссылки
 type Url struct {
 	Data string
 }
 
+// TestConnection - Функция проверки работоспособности сервера
 func TestConnection(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "Connection success")
 	log.Println("[SUCCESS] Test connection")
 }
 
+// GetShortUrl - Функция, реализующая обработку "Post" запроса на сервер (возврат сокращенной ссылки)
 func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 
 	inUrl := Url{}
@@ -114,8 +121,9 @@ func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 	w.Write(answer)
 }
 
+// GetOriginalUrl - Функция, реализующая обработку "Get" запроса на сервер (возврат исходной ссылки, если она есть)
 func GetOriginalUrl(w http.ResponseWriter, r *http.Request) {
-	
+
 	inShortUrl := Url{}
 
 	//
@@ -183,10 +191,11 @@ func GetOriginalUrl(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Главная функция проекта
 func main() {
 
 	//
-	// Реализованные запросы
+	// Реализованные обработчики запросов
 	//
 	http.HandleFunc("/", TestConnection)
 	http.HandleFunc("/getshort", GetShortUrl)
