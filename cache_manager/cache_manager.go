@@ -7,16 +7,16 @@ import (
 )
 
 type Cache struct {
-	sync.RWMutex
-	defaultExpiration time.Duration
-	cleanupTime       time.Duration
-	data              map[string]Value
+	sync.RWMutex                       // Асинхронность для корректного доступа для чтения и записи
+	defaultExpiration time.Duration    // Продолжительность жизни кеша по умолчанию
+	cleanupTime       time.Duration    // Интервал, после которого запускается очистка
+	data              map[string]Value // Непосредственно кешируемые данные
 }
 
 type Value struct {
-	CreateTime time.Time
-	Expiration int64
-	Value      string
+	CreateTime time.Time // Время создания
+	Expiration int64     // Время истечения актуальности
+	Value      string    // Непосредственно значение
 }
 
 func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {

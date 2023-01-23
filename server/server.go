@@ -27,11 +27,13 @@ type Url struct {
 }
 
 func TestConnection(w http.ResponseWriter, r *http.Request) {
+
 	fmt.Fprintf(w, "Connection success")
 	log.Println("[SUCCESS] Test connection")
 }
 
 func GetShortUrl(w http.ResponseWriter, r *http.Request) {
+
 	inUrl := Url{}
 
 	//
@@ -51,7 +53,7 @@ func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 	//
 	if shrUrl, isExist := secondCache.Get(inUrl.Data); isExist {
 		answer = []byte(shrUrl)
-		log.Println("[SUCCESS] Url found in cache: ", shrUrl, "    ||    ", inUrl.Data)
+		log.Println("[SUCCESS] Url found in cache: ", shrUrl, "(In URL: ", inUrl.Data, ")")
 		w.Write(answer)
 		return
 	}
@@ -81,10 +83,10 @@ func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 	row, isExist := db.GetUrlRow(inUrl.Data, false)
 	if isExist {
 		answer = []byte(row.ShortUrl)
-		log.Println("[SUCCESS] Url found in database: ", string(answer), "     ||    ", inUrl.Data)
+		log.Println("[SUCCESS] Url found in database: ", string(answer), "(In URL: ", inUrl.Data, ")")
 	} else {
 		//
-		// Если значение не найдено, то генерация новой ссылки и добавление в БД
+		// Генерация новой ссылки с последующим добавлением в БД, если значение не найдено
 		//
 		answer = []byte(generator.GenerateShortUrl(inUrl.Data))
 		err = db.SaveShortUrl(database.RowData{
@@ -97,7 +99,7 @@ func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 			log.Println("[ERROR] Failed to add data to database")
 			return
 		}
-		log.Println("[SUCCESS] Url was generated successfully: ", string(answer), "     ||    ", inUrl.Data)
+		log.Println("[SUCCESS] Url was generated successfully: ", string(answer), "(In URL: ", inUrl.Data, ")")
 	}
 
 	//
@@ -113,6 +115,7 @@ func GetShortUrl(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetOriginalUrl(w http.ResponseWriter, r *http.Request) {
+	
 	inShortUrl := Url{}
 
 	//
@@ -131,7 +134,7 @@ func GetOriginalUrl(w http.ResponseWriter, r *http.Request) {
 	//
 	if origUrl, isExist := firstCache.Get(inShortUrl.Data); isExist {
 		answer = []byte(origUrl)
-		log.Println("[SUCCESS] Url found in cache: ", origUrl, "    ||    ", inShortUrl.Data)
+		log.Println("[SUCCESS] Url found in cache: ", origUrl, "(Short URL: ", inShortUrl.Data, ")")
 		w.Write(answer)
 		return
 	}
@@ -161,22 +164,30 @@ func GetOriginalUrl(w http.ResponseWriter, r *http.Request) {
 	row, isExist := db.GetUrlRow(inShortUrl.Data, true)
 	if isExist {
 		answer = []byte(row.Url)
-		log.Println("[SUCCESS] Url found in database: ", string(answer), "     ||    ", inShortUrl.Data)
+		log.Println("[SUCCESS] Url found in database: ", string(answer), "(Short URL: ", inShortUrl.Data, ")")
+		//
+		// Добавление значений в кеш
+		//
+		firstCache.Set(inShortUrl.Data, string(answer), 0)
+		secondCache.Set(string(answer), inShortUrl.Data, 0)
 		//
 		// Запись ответа
 		//
 		w.Write(answer)
 	} else {
 		//
-		// Если значение не найдено, то возврат ошибки
+		// Возврат ошибки, если значение не найдено
 		//
-		log.Println("[ERROR] Url not found: ")
+		log.Println("[ERROR] Url not found")
 		http.Error(w, "Error: Url not found (status code: 404)", http.StatusNotFound)
 	}
 }
 
 func main() {
 
+	//
+	// Реализованные запросы
+	//
 	http.HandleFunc("/", TestConnection)
 	http.HandleFunc("/getshort", GetShortUrl)
 	http.HandleFunc("/getoriginal", GetOriginalUrl)

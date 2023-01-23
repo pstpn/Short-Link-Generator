@@ -29,18 +29,6 @@ services:
       POSTGRES_PASSWORD: postgres
       DATABASE_URL: "postgresql://admin:sop.ts@postgres:5432/Gen_DB"
 
-#  nginx:
-#    image: nginx:1.15-alpine
-#    restart: unless-stopped
-#    volumes:
-#      - ./nginx/:/etc/nginx/conf.d
-#    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    depends_on:
-#      - backend
-
   pgadmin:
     container_name: pgadmin_container
     image: dpage/pgadmin4

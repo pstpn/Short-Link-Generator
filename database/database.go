@@ -30,6 +30,7 @@ func GetConnection() (Connection, error) {
 }
 
 func (c Connection) GetUrlRow(url string, isShortUrl bool) (*RowData, bool) {
+
 	var row pgx.Row
 
 	if isShortUrl {
@@ -51,6 +52,7 @@ func (c Connection) GetUrlRow(url string, isShortUrl bool) (*RowData, bool) {
 }
 
 func (c Connection) SaveShortUrl(row RowData) error {
+
 	_, err := c.conn.Exec(context.Background(), "INSERT INTO"+config.TableNameDB+
 		" ("+config.UrlColName+", "+config.ShortUrlColName+") VALUES ($1, $2)", row.Url, row.ShortUrl)
 	if err != nil {
@@ -61,6 +63,7 @@ func (c Connection) SaveShortUrl(row RowData) error {
 }
 
 func (c Connection) CloseConnection() error {
+	
 	err := c.conn.Close(context.Background())
 	if err != nil {
 		return err

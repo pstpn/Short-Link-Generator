@@ -6,6 +6,7 @@ import (
 )
 
 func GenerateShortUrl(url string) string {
+
 	tmp := sha256.Sum256([]byte(url))
 
 	for i := 0; i < config.ShortUrlLen; i++ {
@@ -24,59 +25,8 @@ func GenerateShortUrl(url string) string {
 }
 
 //
-// Testing Hash function
-//
-//hashMap := make(map[string]string, 100000000)
-//inHashMap := make(map[string]int, 100000000)
-//errCount := 0
-//
-//var i uint64
-//
-//randSource := rand.NewSource(time.Now().UnixNano())
-//randGen := rand.New(randSource)
-//
-//for k := 0; k < 10; k++ {
-//	for i = 0; i < 10000; i++ {
-//		curNum := int(uint8(randGen.Int()))
-//
-//		newUrl := "https://vk.com/"
-//		for j := 0; j < curNum; j++ {
-//			tmp := uint8(randGen.Int())
-//			if tmp < 26 || tmp == 96 ||
-//				(tmp > 90 && tmp < 95) {
-//				tmp = 65 + tmp%35
-//			} else if (tmp >= 26 && tmp < 48) ||
-//				(tmp > 57 && tmp < 65) {
-//				tmp = 48 + tmp%15
-//			} else if tmp > 122 {
-//				tmp = 97 + tmp%28
-//			}
-//			newUrl += string(tmp)
-//		}
-//
-//		curHash := GenerateShortUrl(newUrl)
-//		if hashMap[curHash] != "" && inHashMap[newUrl] == 0 {
-//			fmt.Println("DUBLICATE: ", hashMap[curHash]+"   |   "+newUrl)
-//			errCount++
-//			fmt.Println("ERROR_COUNT: ", errCount)
-//		} else {
-//			hashMap[curHash] = newUrl
-//		}
-//
-//		inHashMap[newUrl] = 1
-//	}
-//}
-//
-//logFile, _ := os.Create("log.txt")
-//
-//for newUrl, inUrl := range hashMap {
-//	logFile.Write([]byte("New_url: " + newUrl + "   |   In_url: " + inUrl + "\n"))
-//}
-//
-//logFile.Close()
-
 // Examples:
-
+//
 //New_url: http://exmpl.lnk/B5ewlrwvyM   |   In_url: https://vk.com/UU20H51XnnqlYAcmuiNWQunyV2vjswtim=LBMzEgcHN0Ybs{OX{00;2upd;r2Dbx7m0bsqhnFaeeghYvk|Hzw78qrEuJ3|[4wpWe>41v3rzQQ4bs3leGr7J9sBpso=xMd<tlvs=molyhuzwapRhYgnasp0Jxzsl
 //New_url: http://exmpl.lnk/eE851lbxMg   |   In_url: https://vk.com/fmsbCloegFF2CNxaqd:SicjInYlWPI2cy_Fy6WfXOVWlCkGsw|qqTGw1o>swpnMl2EX1RcvQ3I_vKptmmta1i1gkxbo{X|ure
 //New_url: http://exmpl.lnk/TeZdsYyxv3   |   In_url: https://vk.com/gPlXqqVb2|d
