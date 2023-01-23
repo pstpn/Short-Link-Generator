@@ -3,14 +3,13 @@ package database
 import (
 	"context"
 	"github.com/jackc/pgx/v5"
-	"log"
 	"my_project/urlgen/config"
 	"os"
 )
 
 type RowData struct {
-	Id       int    // (serial, primary_key, not null)
-	Url      string // (text, primary_key, not null)
+	Id       int    // (serial, not null)
+	Url      string // (text, not null)
 	ShortUrl string // (text, primary_key, not null)
 }
 
@@ -19,9 +18,9 @@ type Connection struct {
 }
 
 func GetConnection() (Connection, error) {
+
 	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		log.Fatal(err.Error())
 		return Connection{}, err
 	}
 
@@ -30,26 +29,31 @@ func GetConnection() (Connection, error) {
 	return newConnection, nil
 }
 
-func (c Connection) GetOriginalUrlRow(shortUrl string) (*RowData, error) {
-	row := c.conn.QueryRow(context.Background(), "SELECT * FROM "+config.TableNameDB+" WHERE "+config.ShortUrlColName+
-		" = $1", shortUrl)
+func (c Connection) GetUrlRow(url string, isShortUrl bool) (*RowData, bool) {
+	var row pgx.Row
+
+	if isShortUrl {
+		row = c.conn.QueryRow(context.Background(),
+			"SELECT * FROM"+config.TableNameDB+" WHERE "+config.ShortUrlColName+" = $1", url)
+	} else {
+		row = c.conn.QueryRow(context.Background(),
+			"SELECT * FROM"+config.TableNameDB+" WHERE "+config.UrlColName+" = $1", url)
+	}
 
 	r := RowData{}
 
 	err := row.Scan(&r.Id, &r.Url, &r.ShortUrl)
 	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+		return nil, false
 	}
 
-	return &r, nil
+	return &r, true
 }
 
 func (c Connection) SaveShortUrl(row RowData) error {
-	_, err := c.conn.Exec(context.Background(), "INSERT INTO "+config.TableNameDB+
-		" (url, short_url) VALUES ($1, $2)", row.Url, row.ShortUrl)
+	_, err := c.conn.Exec(context.Background(), "INSERT INTO"+config.TableNameDB+
+		" ("+config.UrlColName+", "+config.ShortUrlColName+") VALUES ($1, $2)", row.Url, row.ShortUrl)
 	if err != nil {
-		log.Fatal(err.Error())
 		return err
 	}
 
@@ -59,7 +63,6 @@ func (c Connection) SaveShortUrl(row RowData) error {
 func (c Connection) CloseConnection() error {
 	err := c.conn.Close(context.Background())
 	if err != nil {
-		log.Fatal(err.Error())
 		return err
 	}
 

@@ -16,7 +16,7 @@ type Cache struct {
 type Value struct {
 	CreateTime time.Time
 	Expiration int64
-	Value      interface{}
+	Value      string
 }
 
 func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {
@@ -30,13 +30,13 @@ func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {
 	}
 
 	if cleanupTime > 0 {
-		cache.StartGC()
+		cache.startGC()
 	}
 
 	return &cache
 }
 
-func (c *Cache) Set(key string, value interface{}, duration time.Duration) {
+func (c *Cache) Set(key string, value string, duration time.Duration) {
 
 	var expiration int64
 
@@ -59,7 +59,7 @@ func (c *Cache) Set(key string, value interface{}, duration time.Duration) {
 
 }
 
-func (c *Cache) Get(key string) (interface{}, bool) {
+func (c *Cache) Get(key string) (string, bool) {
 
 	c.RLock()
 	defer c.RUnlock()
@@ -67,12 +67,12 @@ func (c *Cache) Get(key string) (interface{}, bool) {
 	item, found := c.data[key]
 
 	if !found {
-		return nil, false
+		return "", false
 	}
 
 	if item.Expiration > 0 &&
 		time.Now().UnixNano() > item.Expiration {
-		return nil, false
+		return "", false
 	}
 
 	return item.Value, true
@@ -92,11 +92,11 @@ func (c *Cache) Delete(key string) error {
 	return nil
 }
 
-func (c *Cache) StartGC() {
-	go c.GC()
+func (c *Cache) startGC() {
+	go c.gC()
 }
 
-func (c *Cache) GC() {
+func (c *Cache) gC() {
 
 	for {
 		<-time.After(c.cleanupTime)

@@ -8,7 +8,7 @@ import (
 func GenerateShortUrl(url string) string {
 	tmp := sha256.Sum256([]byte(url))
 
-	for i := 0; i < 32; i++ {
+	for i := 0; i < config.ShortUrlLen; i++ {
 		if tmp[i] < 26 || tmp[i] == 96 ||
 			(tmp[i] > 90 && tmp[i] < 95) {
 			tmp[i] = 65 + tmp[i]%26
@@ -20,7 +20,7 @@ func GenerateShortUrl(url string) string {
 		}
 	}
 
-	return config.GenUrl + string(tmp[:10])
+	return config.GenUrl + string(tmp[:config.ShortUrlLen])
 }
 
 //
