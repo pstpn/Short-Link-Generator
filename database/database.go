@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"github.com/jackc/pgx/v5"
 	"my_project/urlgen/config"
 	"os"
@@ -32,18 +33,33 @@ func GetConnection() (Connection, error) {
 	return newConnection, nil
 }
 
-// GetUrlRow - Метод, позволяющий получить строку из БД по заданным данным
-func (c Connection) GetUrlRow(url string, isShortUrl bool) (*RowData, bool) {
+// GetUrlRow - Метод, позволяющий получить строку из БД по заданной исходной ссылке
+func (c Connection) GetUrlRow(url string) (*RowData, bool) {
 
 	var row pgx.Row
 
-	if isShortUrl {
-		row = c.conn.QueryRow(context.Background(),
-			"SELECT * FROM"+config.TableNameDB+" WHERE "+config.ShortUrlColName+" = $1", url)
-	} else {
-		row = c.conn.QueryRow(context.Background(),
-			"SELECT * FROM"+config.TableNameDB+" WHERE "+config.UrlColName+" = $1", url)
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.UrlColName)
+
+	row = c.conn.QueryRow(context.Background(), sql, url)
+
+	r := RowData{}
+
+	err := row.Scan(&r.Id, &r.Url, &r.ShortUrl)
+	if err != nil {
+		return nil, false
 	}
+
+	return &r, true
+}
+
+// GetShortUrlRow - Метод, позволяющий получить строку из БД по заданной короткой ссылке
+func (c Connection) GetShortUrlRow(shortUrl string) (*RowData, bool) {
+
+	var row pgx.Row
+
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.ShortUrlColName)
+
+	row = c.conn.QueryRow(context.Background(), sql, shortUrl)
 
 	r := RowData{}
 
