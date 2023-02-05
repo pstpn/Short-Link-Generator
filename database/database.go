@@ -15,32 +15,30 @@ type RowData struct {
 	ShortUrl string // (text, primary_key, not null)
 }
 
-// Connection - Тип данных, реализующий структуру для более удобной работы с БД и подключением в ней
-type Connection struct {
-	conn *pgx.Conn
+// Database - Тип данных, реализующий структуру для более удобной работы с БД и подключением в ней
+type Database struct {
+	db *pgx.Conn // База данных
 }
 
 // GetConnection - Функция, позволяющая подключиться к БД
-func GetConnection() (Connection, error) {
+func GetConnection() (Database, error) {
 
 	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		return Connection{}, err
+		return Database{}, err
 	}
 
-	newConnection := Connection{conn}
-
-	return newConnection, nil
+	return Database{conn}, nil
 }
 
 // GetUrlRow - Метод, позволяющий получить строку из БД по заданной исходной ссылке
-func (c Connection) GetUrlRow(url string) (*RowData, bool) {
+func (c *Database) GetUrlRow(url string) (*RowData, bool) {
 
 	var row pgx.Row
 
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.UrlColName)
 
-	row = c.conn.QueryRow(context.Background(), sql, url)
+	row = c.db.QueryRow(context.Background(), sql, url)
 
 	r := RowData{}
 
@@ -53,13 +51,13 @@ func (c Connection) GetUrlRow(url string) (*RowData, bool) {
 }
 
 // GetShortUrlRow - Метод, позволяющий получить строку из БД по заданной короткой ссылке
-func (c Connection) GetShortUrlRow(shortUrl string) (*RowData, bool) {
+func (c *Database) GetShortUrlRow(shortUrl string) (*RowData, bool) {
 
 	var row pgx.Row
 
 	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.ShortUrlColName)
 
-	row = c.conn.QueryRow(context.Background(), sql, shortUrl)
+	row = c.db.QueryRow(context.Background(), sql, shortUrl)
 
 	r := RowData{}
 
@@ -72,9 +70,9 @@ func (c Connection) GetShortUrlRow(shortUrl string) (*RowData, bool) {
 }
 
 // SaveShortUrl - Метод, позволяющий сохранить в БД заданную строку
-func (c Connection) SaveShortUrl(row RowData) error {
+func (c *Database) SaveShortUrl(row RowData) error {
 
-	_, err := c.conn.Exec(context.Background(), "INSERT INTO"+config.TableNameDB+
+	_, err := c.db.Exec(context.Background(), "INSERT INTO"+config.TableNameDB+
 		" ("+config.UrlColName+", "+config.ShortUrlColName+") VALUES ($1, $2)", row.Url, row.ShortUrl)
 	if err != nil {
 		return err
@@ -84,9 +82,9 @@ func (c Connection) SaveShortUrl(row RowData) error {
 }
 
 // CloseConnection - Метод, реализующий закрытие соединения с БД
-func (c Connection) CloseConnection() error {
+func (c *Database) CloseConnection() error {
 
-	err := c.conn.Close(context.Background())
+	err := c.db.Close(context.Background())
 	if err != nil {
 		return err
 	}

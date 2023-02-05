@@ -5,9 +5,10 @@ FROM golang
 WORKDIR /app/
 
 # Copy files to the container
-COPY cache_manager /app/cache_manager
-COPY generator /app/generator
-COPY server /app/server
+COPY cmd /app/cmd
+COPY pkg/cache_manager /app/pkg/cache_manager
+COPY pkg/generator /app/pkg/generator
+COPY internal/server /app/internal/server
 COPY config /app/config
 COPY database /app/database
 COPY go.mod /app/
@@ -17,4 +18,4 @@ COPY go.sum /app/
 EXPOSE 4000
 
 # Provide defaults for an executing container
-CMD ["go", "run", "server/server.go"]
+CMD ["go", "run", "cmd/app/main.go"]
