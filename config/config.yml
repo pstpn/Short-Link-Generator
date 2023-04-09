@@ -1,0 +1,5 @@
+http:
+  port: ':4000'
+
+logger:
+  log_level: 'info'

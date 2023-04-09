@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+const (
+	CacheDefaultExpiration = 20 * time.Minute // Время жизни кеша по умолчанию
+	CacheCleanupTime       = 20 * time.Minute // Время очистки кеша по умолчанию
+)
+
 // Cache - Тип данных, реализующий менеджер кеша для работы с кешируемыми данными
 type Cache struct {
 	sync.RWMutex                       // Асинхронность для корректного доступа для чтения и записи
@@ -22,19 +27,17 @@ type Value struct {
 }
 
 // CacheCreate - Функция, реализующая создание кеша
-func CacheCreate(defaultExpiration, cleanupTime time.Duration) *Cache {
+func CacheCreate() *Cache {
 
 	data := make(map[string]Value)
 
 	cache := Cache{
 		data:              data,
-		defaultExpiration: defaultExpiration,
-		cleanupTime:       cleanupTime,
+		defaultExpiration: CacheDefaultExpiration,
+		cleanupTime:       CacheCleanupTime,
 	}
 
-	if cleanupTime > 0 {
-		cache.startGC()
-	}
+	cache.startGC()
 
 	return &cache
 }

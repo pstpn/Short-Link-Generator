@@ -5,10 +5,10 @@ FROM golang
 WORKDIR /app/
 
 # Copy files to the container
+COPY init/init_db.sql /docker-entrypoint-initdb.d/
 COPY cmd /app/cmd
-COPY pkg/cache_manager /app/pkg/cache_manager
-COPY pkg/generator /app/pkg/generator
-COPY internal/server /app/internal/server
+COPY pkg/ /app/pkg/
+COPY internal/ /app/internal/
 COPY config /app/config
 COPY database /app/database
 COPY go.mod /app/

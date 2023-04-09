@@ -1,14 +1,43 @@
 package config
 
-import "time"
+import (
+	"fmt"
 
-const (
-	GenUrl                 = "http://exmpl.lnk/" // Основа генерируемой короткой ссылки
-	ServerPort             = ":4000"             // Порт, на котором развернуто приложение
-	TableNameDB            = " \"GenTable\""     // Название таблицы в БД (начинается с пробела)
-	UrlColName             = "url"               // Название столбца с исходными ссылками в БД
-	ShortUrlColName        = "short_url"         // Название столбца с короткими ссылками в БД
-	ShortUrlLen            = 10                  // Длина части выходной короткой ссылки после длины основы "GenUrl" (до 32 символов)
-	CacheDefaultExpiration = 20 * time.Minute    // Время жизни кеша по умолчанию
-	CacheCleanupTime       = 20 * time.Minute    // Время очистки кеша по умолчанию
+	"github.com/ilyakaznacheev/cleanenv"
 )
+
+type (
+	// Config - Структура, описывающая конфигурацию проекта
+	Config struct {
+		HTTP `yaml:"http"`
+		Log  `yaml:"logger"`
+	}
+
+	// HTTP - Структура, описывающая конфигурацию сервера
+	HTTP struct {
+		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+	}
+
+	// Log - Структура, описывающая конфигурацию logger
+	Log struct {
+		Level string `env-required:"true" yaml:"log_level"   env:"LOG_LEVEL"`
+	}
+)
+
+// NewConfig - Функция, создающая новый конфиг
+func NewConfig() (*Config, error) {
+
+	cfg := &Config{}
+
+	err := cleanenv.ReadConfig("./config/config.yml", cfg)
+	if err != nil {
+		return nil, fmt.Errorf("reading error: %w", err)
+	}
+
+	err = cleanenv.ReadEnv(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}

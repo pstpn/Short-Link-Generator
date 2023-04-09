@@ -2,9 +2,7 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"github.com/jackc/pgx/v5"
-	"my_project/urlgen/config"
 	"os"
 )
 
@@ -21,14 +19,14 @@ type Database struct {
 }
 
 // GetConnection - Функция, позволяющая подключиться к БД
-func GetConnection() (Database, error) {
+func GetConnection() (*Database, error) {
 
 	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		return Database{}, err
+		return &Database{}, err
 	}
 
-	return Database{conn}, nil
+	return &Database{conn}, nil
 }
 
 // GetUrlRow - Метод, позволяющий получить строку из БД по заданной исходной ссылке
@@ -36,7 +34,7 @@ func (c *Database) GetUrlRow(url string) (*RowData, bool) {
 
 	var row pgx.Row
 
-	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.UrlColName)
+	sql := "SELECT * FROM \"GenTable\" WHERE url = $1"
 
 	row = c.db.QueryRow(context.Background(), sql, url)
 
@@ -55,7 +53,7 @@ func (c *Database) GetShortUrlRow(shortUrl string) (*RowData, bool) {
 
 	var row pgx.Row
 
-	sql := fmt.Sprintf("SELECT * FROM %s WHERE %s = $1", config.TableNameDB, config.ShortUrlColName)
+	sql := "SELECT * FROM \"GenTable\" WHERE short_url = $1"
 
 	row = c.db.QueryRow(context.Background(), sql, shortUrl)
 
@@ -72,8 +70,9 @@ func (c *Database) GetShortUrlRow(shortUrl string) (*RowData, bool) {
 // SaveShortUrl - Метод, позволяющий сохранить в БД заданную строку
 func (c *Database) SaveShortUrl(row RowData) error {
 
-	_, err := c.db.Exec(context.Background(), "INSERT INTO"+config.TableNameDB+
-		" ("+config.UrlColName+", "+config.ShortUrlColName+") VALUES ($1, $2)", row.Url, row.ShortUrl)
+	sql := "INSERT INTO \"GenTable\" (url, short_url) VALUES ($1, $2)"
+
+	_, err := c.db.Exec(context.Background(), sql, row.Url, row.ShortUrl)
 	if err != nil {
 		return err
 	}
